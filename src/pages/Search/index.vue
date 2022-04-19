@@ -12,38 +12,57 @@
             </li>
           </ul>
           <ul class="fl sui-tag">
-            <li class="with-x">手机</li>
-            <li class="with-x">iphone<i>×</i></li>
-            <li class="with-x">华为<i>×</i></li>
-            <li class="with-x">OPPO<i>×</i></li>
+            <!-- 分类的面包屑 -->
+            <li class="with-x" v-if="searchParams.categoryName">
+              {{ searchParams.categoryName
+              }}<i @click="removeCategoryName">×</i>
+            </li>
+            <!-- 关键字的面包屑 -->
+            <li class="with-x" v-if="searchParams.keyword">
+              {{ searchParams.keyword }}<i @click="removeKeyword">×</i>
+            </li>
+            <!-- 品牌信息的面包屑 -->
+            <li class="with-x" v-if="searchParams.trademark">
+              {{ searchParams.trademark.split(":")[1]
+              }}<i @click="removeTrademark">×</i>
+            </li>
+            <!-- 平台售卖属性的面包屑 -->
+            <li
+              class="with-x"
+              v-for="(attrValue, index) in searchParams.props"
+              :key="index"
+            >
+              {{ attrValue.split(":")[1] }}<i @click="removeAttr(index)">×</i>
+            </li>
           </ul>
         </div>
 
         <!--selector-->
-        <SearchSelector />
+        <SearchSelector @trademarkInfo="trademarkInfo" @attrInfo="attrInfo" />
 
         <!--details-->
         <div class="details clearfix">
           <div class="sui-navbar">
             <div class="navbar-inner filter">
+              <!-- 排序结构 -->
               <ul class="sui-nav">
-                <li class="active">
-                  <a href="#">综合</a>
+                <li :class="{ active: isOne }" @click="changeOrder('1')">
+                  <a href="#"
+                    >综合<span
+                      v-show="isOne"
+                      class="iconfont"
+                      :class="{ 'icon-up': isAsc, 'icon-down': isDesc }"
+                    ></span
+                  ></a>
                 </li>
-                <li>
-                  <a href="#">销量</a>
-                </li>
-                <li>
-                  <a href="#">新品</a>
-                </li>
-                <li>
-                  <a href="#">评价</a>
-                </li>
-                <li>
-                  <a href="#">价格⬆</a>
-                </li>
-                <li>
-                  <a href="#">价格⬇</a>
+                <li :class="{ active: isTwo }" @click="changeOrder('2')">
+                  <a href="#"
+                    >价格<span
+                      v-show="isTwo"
+                      class="iconfont"
+                      :class="{ 'icon-up': isAsc, 'icon-down': isDesc }"
+                    ></span
+                  ></a>
                 </li>
               </ul>
             </div>
@@ -53,9 +72,9 @@
               <li class="yui3-u-1-5" v-for="goods in goodsList" :key="goods.id">
                 <div class="list-wrap">
                   <div class="p-img">
-                    <a href="item.html" target="_blank"
+                    <router-link :to="`/detail/${goods.id}`"
                       ><img :src="goods.defaultImg"
-                    /></a>
+                    /></router-link>
                   </div>
                   <div class="price">
                     <strong>
@@ -89,35 +108,13 @@
               </li>
             </ul>
           </div>
-          <div class="fr page">
-            <div class="sui-pagination clearfix">
-              <ul>
-                <li class="prev disabled">
-                  <a href="#">«上一页</a>
-                </li>
-                <li class="active">
-                  <a href="#">1</a>
-                </li>
-                <li>
-                  <a href="#">2</a>
-                </li>
-                <li>
-                  <a href="#">3</a>
-                </li>
-                <li>
-                  <a href="#">4</a>
-                </li>
-                <li>
-                  <a href="#">5</a>
-                </li>
-                <li class="dotted"><span>...</span></li>
-                <li class="next">
-                  <a href="#">下一页»</a>
-                </li>
-              </ul>
-              <div><span>共10页&nbsp;</span></div>
-            </div>
-          </div>
+          <Pagination
+            :pageNo="searchParams.pageNo"
+            :pageSize="searchParams.pageSize"
+            :total="total"
+            :continues="5"
+            @getPageNo="getPageNo"
+          ></Pagination>
         </div>
       </div>
     </div>
@@ -125,7 +122,7 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters, mapState } from "vuex";
 import SearchSelector from "./SearchSelector/SearchSelector";
 export default {
   name: "Search",
@@ -144,7 +141,7 @@ export default {
         //关键字
         keyword: "",
         //排序
-        order: "",
+        order: "1:desc",
         //分页器用的：代表的是当前是第几页
         pageNo: 1,
         //代表的是每一个展示数据
@@ -162,6 +159,21 @@ export default {
   computed: {
     //mapGetters里面的写法，传递的是数组，getters没有划分模块
     ...mapGetters(["goodsList"]),
+    ...mapState({
+      total: (state) => state.search.searchList.total,
+    }),
+    isOne() {
+      return this.searchParams.order.indexOf("1") !== -1;
+    },
+    isTwo() {
+      return this.searchParams.order.indexOf("2") !== -1;
+    },
+    isAsc() {
+      return this.searchParams.order.indexOf("asc") !== -1;
+    },
+    isDesc() {
+      return this.searchParams.order.indexOf("desc") !== -1;
+    },
   },
   beforeMount() {
     //合并对象属性
@@ -176,6 +188,79 @@ export default {
       this.$store.dispatch("getSearchList", this.searchParams);
       console.log(this.searchParams);
     },
+    //删除分类的名字
+    removeCategoryName() {
+      //带给服务器参数说明可有可无的，如果属性值为空的字符串还是会把相应的字段带给服务器，但是把相应的字段设置为undefined，当前字段就不会带给服务器了
+      this.searchParams.categoryName = undefined;
+      this.searchParams.category1Id = undefined;
+      this.searchParams.category2Id = undefined;
+      this.searchParams.category3Id = undefined;
+      //修改地址栏query和params参数,通过编程式导航自己跳自己去掉query和params参数的显式。而我们应该保留params参数
+      if (this.$route.params) {
+        this.$router.push({ name: "search", params: this.$route.params });
+      }
+      this.getData();
+    },
+    //删除关键字面包屑并通知Header清除keyword
+    removeKeyword() {
+      this.searchParams.keyword = undefined;
+      if (this.$route.query) {
+        this.$router.push({ name: "search", query: this.$route.query });
+      }
+      this.getData();
+      //通知header组件清除关键字
+      this.$bus.$emit("clear");
+    },
+    //自定义事件接收子组件传递的trademark
+    trademarkInfo(trademark) {
+      // console.log(trademark);
+      //整理参数 "ID:名称"
+      this.searchParams.trademark = `${trademark.tmId}:${trademark.tmName}`;
+      //再次发送请求更新列表数据
+      this.getData();
+    },
+    //删除品牌信息面包屑
+    removeTrademark() {
+      this.searchParams.trademark = undefined;
+      //再次发请求
+      this.getData();
+    },
+    //收集平台属性
+    attrInfo(attr, attrValue) {
+      //整理参数
+      // console.log(attr, attrValue);
+      const props = `${attr.attrId}:${attrValue}:${attr.attrName}`;
+      this.searchParams.props.push(props);
+      this.searchParams.props = [...new Set(this.searchParams.props)];
+      this.getData();
+    },
+    //删除商品属性面包屑
+    removeAttr(index) {
+      this.searchParams.props.splice(index, 1);
+      this.getData();
+    },
+    //改变order参数
+    changeOrder(flag) {
+      const origin = this.searchParams.order;
+      const originFlag = origin.split(":")[0];
+      const originSort = origin.split(":")[1];
+      let newOrder = "";
+      //确定点击的是综合
+      if (originFlag === flag) {
+        newOrder = `${originFlag}:${originSort === "desc" ? "asc" : "desc"}`;
+        this.searchParams.order = newOrder;
+        this.getData();
+      } else {
+        newOrder = `${flag}:${originSort}`;
+        this.searchParams.order = newOrder;
+        this.getData();
+      }
+    },
+    //自定义事件获取当前页面
+    getPageNo(pageNo) {
+      this.searchParams.pageNo = pageNo;
+      this.getData();
+    },
   },
   //数据监听，监听组件实例身上的属性的属性值变化
   watch: {
@@ -183,9 +268,9 @@ export default {
       Object.assign(this.searchParams, this.$route.query, this.$route.params);
       this.getData();
       //每一次请求完毕，应该把相应的1、2、3级分类的id置空，让他接受下一次相应的1、2、3id
-      this.searchParams.category1Id = ''
-      this.searchParams.category2Id = ''
-      this.searchParams.category3Id = ''
+      this.searchParams.category1Id = "";
+      this.searchParams.category2Id = "";
+      this.searchParams.category3Id = "";
     },
   },
 };

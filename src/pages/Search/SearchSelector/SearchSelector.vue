@@ -4,7 +4,11 @@
       <div class="fl key brand">品牌</div>
       <div class="value logos">
         <ul class="logo-list">
-          <li v-for="trademark in trademarkList" :key="trademark.tmId">
+          <li
+            v-for="trademark in trademarkList"
+            :key="trademark.tmId"
+            @click="tradeMatkHandler(trademark)"
+          >
             {{ trademark.tmName }}
           </li>
         </ul>
@@ -14,11 +18,16 @@
         <a href="javascript:void(0);">更多</a>
       </div>
     </div>
+    <!-- 售卖平台的属性 -->
     <div class="type-wrap" v-for="attr in attrsList" :key="attr.attrId">
       <div class="fl key">{{ attr.attrName }}</div>
       <div class="fl value">
         <ul class="type-list">
-          <li v-for="(attrValue, index) in attr.attrValueList" :key="index">
+          <li
+            v-for="(attrValue, index) in attr.attrValueList"
+            :key="index"
+            @click="attrInfo(attr,attrValue)"
+          >
             <a>{{ attrValue }}</a>
           </li>
         </ul>
@@ -34,6 +43,18 @@ export default {
   name: "SearchSelector",
   computed: {
     ...mapGetters(["trademarkList", "attrsList"]),
+  },
+  methods: {
+    //品牌的事件处理函数
+    tradeMatkHandler(trademark) {
+      //点击了品牌，还是需要整理参数，向服务器发送请求获取相应的数据进行展示.子组件将品牌信息传给父组件，父组件接受后整理参数发送请求
+      this.$emit("trademarkInfo", trademark);
+    },
+    //
+    attrInfo(attr,attrValue){
+      //参数 ["属性ID:属性值:属性名"]
+      this.$emit('attrInfo',attr,attrValue)
+    }
   },
 };
 </script>

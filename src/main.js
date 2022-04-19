@@ -7,6 +7,9 @@ Vue.component(TypeNav.name, TypeNav)
 //设置全局组件轮播图
 import Carousel from '@/components/Carousel'
 Vue.component(Carousel.name, Carousel)
+//设置全局组件分页器
+import Pagination from '@/components/Pagination'
+Vue.component(Pagination.name,Pagination)
 
 import router from '@/router'
 
@@ -21,5 +24,9 @@ import 'swiper/css/swiper.css'
 new Vue({
   router,
   render: h => h(App),
-  store
+  store,
+  //配置全局事件总线$bus
+  beforeCreate() {
+    Vue.prototype.$bus = this
+  }
 }).$mount('#app')
