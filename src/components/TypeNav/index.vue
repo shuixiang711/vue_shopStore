@@ -108,7 +108,7 @@ export default {
     changeIndex: throttle(function (index) {
       // console.log(index);
       this.currentIndex = index;
-    }),
+    },500),
     //鼠标移出一级分类 currentIndex变为-1
     leaveIndex() {
       this.currentIndex = -1;
