@@ -28,5 +28,21 @@ export const reaCartList = () => requests.get('/cart/cartList')
 export const reqDeleteCartById = (skuId) => requests.delete(`/cart/deleteCart/${skuId}`)
 
 //修改商品选中状态 /api/cart/checkCart/{skuID}/{isChecked}
-export const reqUpdateCheckedById = (skuId,isChecked)=>requests.get(`/cart/checkCart/${skuId}/${isChecked}`)
+export const reqUpdateCheckedById = (skuId, isChecked) => requests.get(`/cart/checkCart/${skuId}/${isChecked}`)
+
+//获取验证码接口  /api/user/passport/sendCode/{phone}
+export const reqGetCode = (phone) => requests.get(`/user/passport/sendCode/${phone}`)
+
+//注册接口  /api/user/passport/register
+export const reqUserRegister = (params) => requests({ url: '/user/passport/register', data: params, method: 'post' })
+
+//登录接口  /api/user/passport/login
+export const reqUserLogin = (params) => requests({ url: '/user/passport/login', data: params, method: 'post' })
+
+
+//获取用户信息【需要带着用户的token】 api/user/passport/auth/getUserInfo
+export const reqUserInfo = () => requests.get('/user/passport/auth/getUserInfo')
+
+//退出登录  /api/user/passport/logout
+export const reqLogout = ()=> requests.get('/user/passport/logout')
 

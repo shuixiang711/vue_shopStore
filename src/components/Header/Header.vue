@@ -6,10 +6,14 @@
       <div class="container">
         <div class="loginList">
           <p>尚品汇欢迎您！</p>
-          <p>
+          <p v-if="!userName">
             <span>请</span>
             <router-link to="/login">登入</router-link>
             <router-link to="/register" class="register">免费注册</router-link>
+          </p>
+          <p v-else>
+            <a>{{ userName }}</a>
+            <a class="register" @click="logout">退出登录</a>
           </p>
         </div>
         <div class="typeList">
@@ -59,7 +63,7 @@ export default {
     return {
       keyWord: "",
     };
-  }, 
+  },
   methods: {
     goSearch() {
       /* 第一种写法 普通字符串 */
@@ -78,11 +82,26 @@ export default {
         this.$router.push(location);
       }
     },
+    //退出登录
+    async logout() {
+      try {
+        //退出登录,发请求给服务器退出登录【清除一些数据；token】
+        await this.$store.dispatch("userLogout");
+        //如果退出成功，回到首页
+        this.$router.push({name:'home'})
+      } catch (error) {}
+    },
   },
   mounted() {
-    this.$bus.$on('clear',()=>{
-      this.keyWord = '';
-    })
+    this.$bus.$on("clear", () => {
+      this.keyWord = "";
+    });
+  },
+  computed: {
+    //用户名信息
+    userName() {
+      return this.$store.state.user.userInfo.name;
+    },
   },
 };
 </script>

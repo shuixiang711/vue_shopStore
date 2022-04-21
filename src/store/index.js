@@ -6,6 +6,7 @@ import home from './home'
 import search from './search'
 import detail from './detail'
 import shopCart from './shopCart'
+import user from './user'
 
 export default new Vuex.Store({
     //注册小仓库
@@ -13,6 +14,7 @@ export default new Vuex.Store({
         home,
         search,
         detail,
-        shopCart
-   }
+        shopCart,
+        user
+    }
 })

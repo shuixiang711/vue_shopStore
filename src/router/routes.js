@@ -15,6 +15,7 @@ export default [
     },
     {
         path: '/home',
+        name: 'home',
         component: Home,
         meta: { isShowFooter: true }
     },
@@ -38,7 +39,7 @@ export default [
         meta: { isShowFooter: true }
     },
     {
-        name:'addcartsuccess',
+        name: 'addcartsuccess',
         path: '/addcartsuccess',
         component: AddCartSuccess,
         meta: { isShowFooter: true }

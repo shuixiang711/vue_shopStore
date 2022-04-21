@@ -24,6 +24,11 @@ requests.interceptors.request.use(config => {
         //请求头添加一个字段，这个字段（userTempId）不能乱写，是和后台老师商量好了的
         config.headers.userTempId = store.state.detail.uuid_token
     }
+    //需要携带token给服务器
+    if (store.state.user.token) {
+        config.headers.token = store.state.user.token
+    }   
+    /* config.headers.token = localStorage.getItem('TOKEN') */
     nprogress.start()
     return config;
 }, error => {
