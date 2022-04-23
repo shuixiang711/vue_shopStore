@@ -53,8 +53,18 @@ router.beforeEach(async (to, from, next) => {
             }
         }
     } else {
+        //用户未登录，不能去交易，购物车，支付相关的，个人中心，去这些路由跳转到登录。不是则放行
         //暂时不能处理
-        next()
+        // console.log(to.path);
+        // next()
+        const condition = ['/shopcart', '/trade', '/pay', 'paysuccess', 'center', '/center/myorder', '/center/grouporder']
+        const toPath = to.path
+        if (condition.includes(to.path)) {
+            //把未登录的信息存储与路由中，登录成功后直接跳转
+            next(`/login?redirect=${toPath}`)
+        } else {
+            next()
+        }
     }
 })
 

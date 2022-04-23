@@ -90,11 +90,19 @@ export default {
     async userLogin() {
       try {
         const { phone, password } = this;
-        (phone && password) &&
-        (await this.$store.dispatch("userLogin", { phone, password }));
-        this.$router.push({name:'home'})
+        phone &&
+          password &&
+          (await this.$store.dispatch("userLogin", { phone, password }));
+        //登录时判断路由中是否包含query，如果有跳转到query值的路由，没有跳转到home
+        /* if (this.$route.query.redirect) {
+          this.$router.push(`${this.$route.query.redirect}`);
+        } else {
+          this.$router.push("/home");
+        } */
+        const toPath = this.$route.query.redirect || "/home";
+        this.$router.push(toPath);
       } catch (error) {
-        alert(error.message)
+        alert(error.message);
       }
     },
   },
