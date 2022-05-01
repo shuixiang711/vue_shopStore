@@ -13,7 +13,7 @@
         >
           <!-- 三级联动 -->
           <div class="sort" v-show="isShow">
-            <!-- 利用事件委派+编程式盗汗实现路由跳转 -->
+            <!-- 利用事件委派+编程式导航实现路由跳转 -->
             <div class="all-sort-list2" @click="goSearch">
               <div
                 class="item"
